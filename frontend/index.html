@@ -1,1 +1,61 @@
 
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pedra, Papel e Tesoura</title>
+
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <main class="container">
+
+        <h1>Pedra, Papel e Tesoura</h1>
+        <p>Escolha sua jogada!</p>
+
+        <section class="opcoes">
+            <button class="opcao" id="pedra">
+                🪨
+                <span>Pedra</span>
+            </button>
+
+            <button class="opcao" id="papel">
+                📄
+                <span>Papel</span>
+            </button>
+
+            <button class="opcao" id="tesoura">
+                ✂️
+                <span>Tesoura</span>
+            </button>
+        </section>
+
+        <section class="placar">
+            <div>
+                <p>Vitórias</p>
+                <span id="vitorias">0</span>
+            </div>
+
+            <div>
+                <p>Derrotas</p>
+                <span id="derrotas">0</span>
+            </div>
+
+            <div>
+                <p>Empates</p>
+                <span id="empates">0</span>
+            </div>
+        </section>
+
+        <p id="mensagem">Aguardando sua jogada...</p>
+
+        <button id="novaRodada">Nova rodada</button>
+
+    </main>
+
+    <script src="script.js"></script>
+</body>
+</html>
+
