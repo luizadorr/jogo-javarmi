@@ -1,68 +1,165 @@
 
-// Elementos da tela
+const API = "http://localhost:8080";
+
 const mensagem = document.getElementById("mensagem");
 const botoes = document.querySelectorAll(".opcao");
 const botaoNovaRodada = document.getElementById("novaRodada");
 
-// Pontuação
-let vitorias = 0;
-let derrotas = 0;
-let empates = 0;
+let idJogador = null;
+let consultando = false;
+let intervaloConsulta = null;
 
-// Opções do jogo
-const jogadas = ["pedra", "papel", "tesoura"];
+async function requisicao(endpoint) {
+    const resposta = await fetch(`${API}${endpoint}`);
+    const dados = await resposta.json();
 
-// Recebe a jogada do jogador
+    if (!resposta.ok || dados.erro) {
+        throw new Error(dados.erro || "Erro na comunicação com o servidor.");
+    }
+
+    return dados;
+}
+
+// Registra o jogador no servidor
+async function entrar() {
+    try {
+        const dados = await requisicao("/entrar");
+
+        idJogador = dados.id;
+
+        mensagem.textContent =
+            `Você entrou como Jogador ${idJogador}. Aguardando adversário...`;
+
+        consultarEstado();
+
+        intervaloConsulta = setInterval(consultarEstado, 1000);
+
+    } catch (erro) {
+        mensagem.textContent = erro.message;
+    }
+}
+
+// Envia a jogada para o servidor
+async function jogar(jogada) {
+    if (idJogador === null) return;
+
+    try {
+        await requisicao(
+            `/jogar?id=${idJogador}&jogada=${jogada}`
+        );
+
+        botoes.forEach(botao => botao.disabled = true);
+
+        mensagem.textContent =
+            "Jogada enviada! Aguardando o adversário...";
+
+        consultarEstado();
+
+    } catch (erro) {
+        mensagem.textContent = erro.message;
+    }
+}
+
+// Consulta o estado da partida
+async function consultarEstado() {
+    if (idJogador === null || consultando) return;
+
+    consultando = true;
+
+    try {
+        const estado = await requisicao(
+            `/consultar?id=${idJogador}`
+        );
+
+        document.getElementById("vitorias").textContent =
+            estado.vitorias;
+
+        document.getElementById("derrotas").textContent =
+            estado.derrotas;
+
+        document.getElementById("empates").textContent =
+            estado.empates;
+
+        if (!estado.adversarioConectado) {
+            mensagem.textContent =
+                "Aguardando o segundo jogador entrar...";
+
+        } else if (!estado.rodadaFinalizada) {
+
+            if (estado.euJoguei) {
+                mensagem.textContent =
+                    "Jogada enviada! Aguardando o adversário...";
+            } else {
+                mensagem.textContent =
+                    "Adversário conectado! Escolha sua jogada.";
+
+                botoes.forEach(botao => botao.disabled = false);
+            }
+
+        } else {
+            const adversario = estado.jogadaAdversario
+                ? estado.jogadaAdversario.toLowerCase()
+                : "";
+
+            if (estado.resultado === "VITORIA") {
+                mensagem.textContent =
+                    `Você venceu! O adversário escolheu ${adversario}.`;
+
+            } else if (estado.resultado === "DERROTA") {
+                mensagem.textContent =
+                    `Você perdeu! O adversário escolheu ${adversario}.`;
+
+            } else {
+                mensagem.textContent =
+                    `Empate! Os dois escolheram ${adversario}.`;
+            }
+        }
+
+    } catch (erro) {
+        mensagem.textContent = erro.message;
+    } finally {
+        consultando = false;
+    }
+}
+
+// Botões de jogada
 botoes.forEach(botao => {
+    botao.disabled = true;
+
     botao.addEventListener("click", () => {
-        const jogadaJogador = botao.id;
-
-        // Simulação temporária do adversário
-        const jogadaAdversario =
-            jogadas[Math.floor(Math.random() * jogadas.length)];
-
-        verificarResultado(jogadaJogador, jogadaAdversario);
+        jogar(botao.id.toUpperCase());
     });
 });
 
-// Compara as jogadas
-function verificarResultado(jogador, adversario) {
+// Solicita uma nova rodada
+botaoNovaRodada.addEventListener("click", async () => {
+    if (idJogador === null) return;
 
-    if (jogador === adversario) {
-        mensagem.textContent =
-            `Empate! Os dois escolheram ${adversario}.`;
-        empates++;
+    try {
+        await requisicao(`/nova-rodada?id=${idJogador}`);
 
-    } else if (
-        (jogador === "pedra" && adversario === "tesoura") ||
-        (jogador === "papel" && adversario === "pedra") ||
-        (jogador === "tesoura" && adversario === "papel")
-    ) {
-        mensagem.textContent =
-            `Você venceu! O adversário escolheu ${adversario}.`;
-        vitorias++;
+        botoes.forEach(botao => botao.disabled = true);
 
-    } else {
         mensagem.textContent =
-            `Você perdeu! O adversário escolheu ${adversario}.`;
-        derrotas++;
+            "Solicitação de nova rodada enviada. Aguardando o adversário...";
+
+        consultarEstado();
+
+    } catch (erro) {
+        mensagem.textContent = erro.message;
     }
-
-    atualizarPlacar();
-}
-
-// Atualiza os números do placar
-function atualizarPlacar() {
-    document.getElementById("vitorias").textContent = vitorias;
-    document.getElementById("derrotas").textContent = derrotas;
-    document.getElementById("empates").textContent = empates;
-}
-
-// Reinicia a rodada
-botaoNovaRodada.addEventListener("click", () => {
-    mensagem.textContent = "Aguardando sua jogada...";
 });
 
-// Estado inicial
-atualizarPlacar();
+// Inicia o jogo
+entrar();
 
+// Desconecta ao fechar a página
+window.addEventListener("beforeunload", () => {
+    if (idJogador !== null) {
+        fetch(`${API}/sair?id=${idJogador}`, {
+            keepalive: true
+        });
+    }
+
+    clearInterval(intervaloConsulta);
+});
