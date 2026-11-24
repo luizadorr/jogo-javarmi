@@ -44,7 +44,6 @@ public class ApiHttp {
         );
     }
 
-    // Lê os parâmetros enviados pela URL
     private static Map<String, String> parametros(
             HttpExchange exchange) throws IOException {
 
@@ -68,12 +67,10 @@ public class ApiHttp {
         return mapa;
     }
 
-    // Obtém o ID do jogador
     private static int obterId(Map<String, String> dados) {
         return Integer.parseInt(dados.get("id"));
     }
 
-    // Prepara mensagens de erro
     private static String erro(Exception e) {
 
         String mensagem = e.getMessage();
@@ -89,7 +86,6 @@ public class ApiHttp {
         return "{\"erro\":\"" + mensagem + "\"}";
     }
 
-    // Envia a resposta HTTP
     private static void responder(
             HttpExchange exchange, String json) throws IOException {
 
@@ -123,7 +119,6 @@ public class ApiHttp {
         }
     }
 
-    // Registra um jogador
     private static void entrar(HttpExchange exchange)
             throws IOException {
 
@@ -137,7 +132,6 @@ public class ApiHttp {
         }
     }
 
-    // Envia a jogada
     private static void jogar(HttpExchange exchange)
             throws IOException {
 
@@ -161,7 +155,6 @@ public class ApiHttp {
         }
     }
 
-    // Consulta o estado da partida
     private static void consultar(HttpExchange exchange)
             throws IOException {
 
@@ -202,7 +195,6 @@ public class ApiHttp {
         }
     }
 
-    // Solicita uma nova rodada
     private static void novaRodada(HttpExchange exchange)
             throws IOException {
 
@@ -220,7 +212,6 @@ public class ApiHttp {
         }
     }
 
-    // Desconecta o jogador
     private static void sair(HttpExchange exchange)
             throws IOException {
 

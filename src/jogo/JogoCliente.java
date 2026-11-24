@@ -6,7 +6,6 @@ import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-/** Cliente Swing. Uso: java jogo.JogoCliente [host=localhost] [porta=1099] */
 public class JogoCliente extends JFrame {
     private final JogoRemoto jogo;
     private final int id;

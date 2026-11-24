@@ -20,7 +20,6 @@ async function requisicao(endpoint) {
     return dados;
 }
 
-// Registra o jogador no servidor
 async function entrar() {
     try {
         const dados = await requisicao("/entrar");
@@ -39,7 +38,6 @@ async function entrar() {
     }
 }
 
-// Envia a jogada para o servidor
 async function jogar(jogada) {
     if (idJogador === null) return;
 
@@ -60,7 +58,6 @@ async function jogar(jogada) {
     }
 }
 
-// Consulta o estado da partida
 async function consultarEstado() {
     if (idJogador === null || consultando) return;
 
@@ -122,7 +119,6 @@ async function consultarEstado() {
     }
 }
 
-// Botões de jogada
 botoes.forEach(botao => {
     botao.disabled = true;
 
@@ -131,7 +127,6 @@ botoes.forEach(botao => {
     });
 });
 
-// Solicita uma nova rodada
 botaoNovaRodada.addEventListener("click", async () => {
     if (idJogador === null) return;
 
@@ -150,10 +145,9 @@ botaoNovaRodada.addEventListener("click", async () => {
     }
 });
 
-// Inicia o jogo
+
 entrar();
 
-// Desconecta ao fechar a página
 window.addEventListener("beforeunload", () => {
     if (idJogador !== null) {
         fetch(`${API}/sair?id=${idJogador}`, {

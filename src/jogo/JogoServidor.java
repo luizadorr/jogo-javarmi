@@ -5,9 +5,6 @@ import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
 
-/**
- * Árbitro do jogo. Uso: java jogo.JogoServidor [porta-registry=1099] [hostname-publico]
- */
 public class JogoServidor implements JogoRemoto {
     private static final int PORTA_OBJETO = 1100;
 
@@ -17,7 +14,7 @@ public class JogoServidor implements JogoRemoto {
     private final int[] vitorias = new int[3];
     private int empates = 0;
     private boolean finalizada = false;
-    private Resultado resultadoJ1; // resultado do ponto de vista do jogador 1
+    private Resultado resultadoJ1; 
 
     private static int outro(int id) {
         return id == 1 ? 2 : 1;

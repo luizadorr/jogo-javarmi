@@ -2,15 +2,14 @@ package jogo;
 
 import java.io.Serializable;
 
-/** Retrato do jogo do ponto de vista de um jogador. */
 public class EstadoRodada implements Serializable {
     private static final long serialVersionUID = 1L;
 
     public final boolean adversarioConectado;
     public final boolean euJoguei;
     public final boolean rodadaFinalizada;
-    public final Resultado resultado;          // null enquanto a rodada não terminou
-    public final Jogada jogadaAdversario;      // null enquanto a rodada não terminou
+    public final Resultado resultado;          
+    public final Jogada jogadaAdversario;      
     public final int vitorias;
     public final int derrotas;
     public final int empates;
